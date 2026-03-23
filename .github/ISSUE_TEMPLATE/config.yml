@@ -4,14 +4,14 @@ contact_links:
     url: https://discord.com/invite/crosstalksolutions
     about: Join our Discord community for general questions, support, and discussions
   - name: 📖 Documentation
-    url: https://projectnomad.us
+    url: https://projecthaven.us
     about: Check the official documentation and guides
   - name: 🏆 Community Leaderboard
-    url: https://benchmark.projectnomad.us
-    about: View the N.O.M.A.D. benchmark leaderboard
+    url: https://benchmark.projecthaven.us
+    about: View the H.A.V.E.N. benchmark leaderboard
   - name: 🤝 Contributing Guide
-    url: https://github.com/Crosstalk-Solutions/project-nomad/blob/main/CONTRIBUTING.md
-    about: Learn how to contribute to Project N.O.M.A.D.
+    url: https://github.com/Crosstalk-Solutions/project-haven/blob/main/CONTRIBUTING.md
+    about: Learn how to contribute to Project H.A.V.E.N.
   - name: 📅 Roadmap
-    url: https://roadmap.projectnomad.us
+    url: https://roadmap.projecthaven.us
     about: See our public roadmap, vote on features, and suggest new ones

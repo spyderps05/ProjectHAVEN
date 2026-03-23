@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Project N.O.M.A.D. Uninstall Script
+# Project H.A.V.E.N. Uninstall Script
 
 ###################################################################################################################################################################################################
 
-# Script                | Project N.O.M.A.D. Uninstall Script
+# Script                | Project H.A.V.E.N. Uninstall Script
 # Version               | 1.0.0
 # Author                | Crosstalk Solutions, LLC
 # Website               | https://crosstalksolutions.com
@@ -15,8 +15,8 @@
 #                                                                                                                                                                                                 #
 ###################################################################################################################################################################################################
 
-NOMAD_DIR="/opt/project-nomad"
-MANAGEMENT_COMPOSE_FILE="${NOMAD_DIR}/compose.yml"
+HAVEN_DIR="/opt/project-haven"
+MANAGEMENT_COMPOSE_FILE="${HAVEN_DIR}/compose.yml"
 
 ###################################################################################################################################################################################################
 #                                                                                                                                                                                                 #
@@ -37,21 +37,21 @@ check_has_sudo() {
 }
 
 check_current_directory(){
-  if [ "$(pwd)" == "${NOMAD_DIR}" ]; then
-    echo "Please run this script from a directory other than ${NOMAD_DIR}."
+  if [ "$(pwd)" == "${HAVEN_DIR}" ]; then
+    echo "Please run this script from a directory other than ${HAVEN_DIR}."
     exit 1
   fi
 }
 
 ensure_management_compose_file_exists(){
   if [ ! -f "${MANAGEMENT_COMPOSE_FILE}" ]; then
-    echo "Unable to find the management Docker Compose file at ${MANAGEMENT_COMPOSE_FILE}. There may be a problem with your Project N.O.M.A.D. installation."
+    echo "Unable to find the management Docker Compose file at ${MANAGEMENT_COMPOSE_FILE}. There may be a problem with your Project H.A.V.E.N. installation."
     exit 1
   fi
 }
 
 get_uninstall_confirmation(){
-  read -p "This script will remove ALL Project N.O.M.A.D. files and containers. THIS CANNOT BE UNDONE. Are you sure you want to continue? (y/n): " choice
+  read -p "This script will remove ALL Project H.A.V.E.N. files and containers. THIS CANNOT BE UNDONE. Are you sure you want to continue? (y/n): " choice
   case "$choice" in
     y|Y )
       echo -e "User chose to continue with the uninstallation."
@@ -86,49 +86,49 @@ check_docker_compose() {
 }
 
 storage_cleanup() {
-  read -p "Do you want to delete the Project N.O.M.A.D. storage directory (${NOMAD_DIR})? This is best if you want to start a completely fresh install. This will PERMANENTLY DELETE all stored Nomad data and can't be undone! (y/N): " delete_dir_choice
+  read -p "Do you want to delete the Project H.A.V.E.N. storage directory (${HAVEN_DIR})? This is best if you want to start a completely fresh install. This will PERMANENTLY DELETE all stored Haven data and can't be undone! (y/N): " delete_dir_choice
   case "$delete_dir_choice" in
       y|Y )
-          echo "Removing Project N.O.M.A.D. files..."
-          if rm -rf "${NOMAD_DIR}"; then
-              echo "Project N.O.M.A.D. files removed."
+          echo "Removing Project H.A.V.E.N. files..."
+          if rm -rf "${HAVEN_DIR}"; then
+              echo "Project H.A.V.E.N. files removed."
           else
-              echo "Warning: Failed to fully remove ${NOMAD_DIR}. You may need to remove it manually."
+              echo "Warning: Failed to fully remove ${HAVEN_DIR}. You may need to remove it manually."
           fi
           ;;
       * )
-          echo "Skipping removal of ${NOMAD_DIR}."
+          echo "Skipping removal of ${HAVEN_DIR}."
           ;;
   esac
 }
 
-uninstall_nomad() {
-    echo "Stopping and removing Project N.O.M.A.D. management containers..."
-    docker compose -p project-nomad -f "${MANAGEMENT_COMPOSE_FILE}" down
+uninstall_haven() {
+    echo "Stopping and removing Project H.A.V.E.N. management containers..."
+    docker compose -p project-haven -f "${MANAGEMENT_COMPOSE_FILE}" down
     echo "Allowing some time for management containers to stop..."
     sleep 5
 
 
-    # Stop and remove all containers where name starts with "nomad_"
-    echo "Stopping and removing all Project N.O.M.A.D. app containers..."
-    docker ps -a --filter "name=^nomad_" --format "{{.Names}}" | xargs -r docker rm -f
+    # Stop and remove all containers where name starts with "haven_"
+    echo "Stopping and removing all Project H.A.V.E.N. app containers..."
+    docker ps -a --filter "name=^haven_" --format "{{.Names}}" | xargs -r docker rm -f
     echo "Allowing some time for app containers to stop..."
     sleep 5
 
     echo "Containers should be stopped now."
 
     # Remove the shared Docker network (may still exist if app containers were using it during compose down)
-    echo "Removing project-nomad_default network if it exists..."
-    docker network rm project-nomad_default 2>/dev/null && echo "Network removed." || echo "Network already removed or not found."
+    echo "Removing project-haven_default network if it exists..."
+    docker network rm project-haven_default 2>/dev/null && echo "Network removed." || echo "Network already removed or not found."
 
     # Remove the shared update volume
-    echo "Removing project-nomad_nomad-update-shared volume if it exists..."
-    docker volume rm project-nomad_nomad-update-shared 2>/dev/null && echo "Volume removed." || echo "Volume already removed or not found."
+    echo "Removing project-haven_haven-update-shared volume if it exists..."
+    docker volume rm project-haven_haven-update-shared 2>/dev/null && echo "Volume removed." || echo "Volume already removed or not found."
 
     # Prompt user for storage cleanup and handle it if so
     storage_cleanup
 
-    echo "Project N.O.M.A.D. has been uninstalled. We hope to see you again soon!"
+    echo "Project H.A.V.E.N. has been uninstalled. We hope to see you again soon!"
 }
 
 ###################################################################################################################################################################################################
@@ -142,4 +142,4 @@ ensure_management_compose_file_exists
 ensure_docker_installed
 check_docker_compose
 get_uninstall_confirmation
-uninstall_nomad
+uninstall_haven

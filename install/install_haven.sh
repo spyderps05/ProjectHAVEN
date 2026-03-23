@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Project N.O.M.A.D. Installation Script
+# Project H.A.V.E.N. Installation Script
 
 ###################################################################################################################################################################################################
 
-# Script                | Project N.O.M.A.D. Installation Script
+# Script                | Project H.A.V.E.N. Installation Script
 # Version               | 1.0.0
 # Author                | Crosstalk Solutions, LLC
 # Website               | https://crosstalksolutions.com
@@ -28,14 +28,14 @@ GREEN='\033[1;32m' # Light Green.
 #                                                                                                                                                                                                 #
 ###################################################################################################################################################################################################
 
-WHIPTAIL_TITLE="Project N.O.M.A.D Installation"
-NOMAD_DIR="/opt/project-nomad"
-MANAGEMENT_COMPOSE_FILE_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/management_compose.yaml"
-SIDECAR_UPDATER_DOCKERFILE_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/sidecar-updater/Dockerfile"
-SIDECAR_UPDATER_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/sidecar-updater/update-watcher.sh"
-START_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/start_nomad.sh"
-STOP_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/stop_nomad.sh"
-UPDATE_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/update_nomad.sh"
+WHIPTAIL_TITLE="Project H.A.V.E.N Installation"
+HAVEN_DIR="/opt/project-haven"
+MANAGEMENT_COMPOSE_FILE_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-haven/refs/heads/main/install/management_compose.yaml"
+SIDECAR_UPDATER_DOCKERFILE_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-haven/refs/heads/main/install/sidecar-updater/Dockerfile"
+SIDECAR_UPDATER_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-haven/refs/heads/main/install/sidecar-updater/update-watcher.sh"
+START_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-haven/refs/heads/main/install/start_haven.sh"
+STOP_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-haven/refs/heads/main/install/stop_haven.sh"
+UPDATE_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-haven/refs/heads/main/install/update_haven.sh"
 script_option_debug='true'
 accepted_terms='false'
 local_ip_address=''
@@ -335,8 +335,8 @@ setup_nvidia_container_toolkit() {
 }
 
 get_install_confirmation(){
-  echo -e "${YELLOW}#${RESET} This script will install Project N.O.M.A.D. and its dependencies on your machine."
-  echo -e "${YELLOW}#${RESET} If you already have Project N.O.M.A.D. installed with customized config or data, please be aware that running this installation script may overwrite existing files and configurations. It is highly recommended to back up any important data/configs before proceeding."
+  echo -e "${YELLOW}#${RESET} This script will install Project H.A.V.E.N. and its dependencies on your machine."
+  echo -e "${YELLOW}#${RESET} If you already have Project H.A.V.E.N. installed with customized config or data, please be aware that running this installation script may overwrite existing files and configurations. It is highly recommended to back up any important data/configs before proceeding."
   read -p "Are you sure you want to continue? (y/N): " choice
   case "$choice" in
     y|Y )
@@ -354,9 +354,9 @@ accept_terms() {
   echo "License Agreement & Terms of Use"
   echo "__________________________"
   printf "\n\n"
-  echo "Project N.O.M.A.D. is licensed under the Apache License 2.0. The full license can be found at https://www.apache.org/licenses/LICENSE-2.0 or in the LICENSE file of this repository."
+  echo "Project H.A.V.E.N. is licensed under the Apache License 2.0. The full license can be found at https://www.apache.org/licenses/LICENSE-2.0 or in the LICENSE file of this repository."
   printf "\n"
-  echo "By accepting this agreement, you acknowledge that you have read and understood the terms and conditions of the Apache License 2.0 and agree to be bound by them while using Project N.O.M.A.D."
+  echo "By accepting this agreement, you acknowledge that you have read and understood the terms and conditions of the Apache License 2.0 and agree to be bound by them while using Project H.A.V.E.N."
   echo -e "\n\n"
   read -p "I have read and accept License Agreement & Terms of Use (y/N)? " choice
   case "$choice" in
@@ -370,27 +370,27 @@ accept_terms() {
   esac
 }
 
-create_nomad_directory(){
+create_haven_directory(){
   # Ensure the main installation directory exists
-  if [[ ! -d "$NOMAD_DIR" ]]; then
-    echo -e "${YELLOW}#${RESET} Creating directory for Project N.O.M.A.D at $NOMAD_DIR...\\n"
-    sudo mkdir -p "$NOMAD_DIR"
-    sudo chown "$(whoami):$(whoami)" "$NOMAD_DIR"
+  if [[ ! -d "$HAVEN_DIR" ]]; then
+    echo -e "${YELLOW}#${RESET} Creating directory for Project H.A.V.E.N at $HAVEN_DIR...\\n"
+    sudo mkdir -p "$HAVEN_DIR"
+    sudo chown "$(whoami):$(whoami)" "$HAVEN_DIR"
 
     echo -e "${GREEN}#${RESET} Directory created successfully.\\n"
   else
-    echo -e "${GREEN}#${RESET} Directory $NOMAD_DIR already exists.\\n"
+    echo -e "${GREEN}#${RESET} Directory $HAVEN_DIR already exists.\\n"
   fi
 
   # Also ensure the directory has a /storage/logs/ subdirectory
-  sudo mkdir -p "${NOMAD_DIR}/storage/logs"
+  sudo mkdir -p "${HAVEN_DIR}/storage/logs"
 
   # Create a admin.log file in the logs directory
-  sudo touch "${NOMAD_DIR}/storage/logs/admin.log"
+  sudo touch "${HAVEN_DIR}/storage/logs/admin.log"
 }
 
 download_management_compose_file() {
-  local compose_file_path="${NOMAD_DIR}/compose.yml"
+  local compose_file_path="${HAVEN_DIR}/compose.yml"
 
   echo -e "${YELLOW}#${RESET} Downloading docker-compose file for management...\\n"
   if ! curl -fsSL "$MANAGEMENT_COMPOSE_FILE_URL" -o "$compose_file_path"; then
@@ -417,13 +417,13 @@ download_management_compose_file() {
 
 download_sidecar_files() {
   # Create sidecar-updater directory if it doesn't exist
-  if [[ ! -d "${NOMAD_DIR}/sidecar-updater" ]]; then
-    sudo mkdir -p "${NOMAD_DIR}/sidecar-updater"
-    sudo chown "$(whoami):$(whoami)" "${NOMAD_DIR}/sidecar-updater"
+  if [[ ! -d "${HAVEN_DIR}/sidecar-updater" ]]; then
+    sudo mkdir -p "${HAVEN_DIR}/sidecar-updater"
+    sudo chown "$(whoami):$(whoami)" "${HAVEN_DIR}/sidecar-updater"
   fi
 
-  local sidecar_dockerfile_path="${NOMAD_DIR}/sidecar-updater/Dockerfile"
-  local sidecar_script_path="${NOMAD_DIR}/sidecar-updater/update-watcher.sh"
+  local sidecar_dockerfile_path="${HAVEN_DIR}/sidecar-updater/Dockerfile"
+  local sidecar_script_path="${HAVEN_DIR}/sidecar-updater/update-watcher.sh"
 
   echo -e "${YELLOW}#${RESET} Downloading sidecar updater Dockerfile...\\n"
   if ! curl -fsSL "$SIDECAR_UPDATER_DOCKERFILE_URL" -o "$sidecar_dockerfile_path"; then
@@ -442,9 +442,9 @@ download_sidecar_files() {
 }
 
 download_helper_scripts() {
-  local start_script_path="${NOMAD_DIR}/start_nomad.sh"
-  local stop_script_path="${NOMAD_DIR}/stop_nomad.sh"
-  local update_script_path="${NOMAD_DIR}/update_nomad.sh"
+  local start_script_path="${HAVEN_DIR}/start_haven.sh"
+  local stop_script_path="${HAVEN_DIR}/stop_haven.sh"
+  local update_script_path="${HAVEN_DIR}/update_haven.sh"
 
   echo -e "${YELLOW}#${RESET} Downloading helper scripts...\\n"
   if ! curl -fsSL "$START_SCRIPT_URL" -o "$start_script_path"; then
@@ -470,7 +470,7 @@ download_helper_scripts() {
 
 start_management_containers() {
   echo -e "${YELLOW}#${RESET} Starting management containers using docker compose...\\n"
-  if ! sudo docker compose -p project-nomad -f "${NOMAD_DIR}/compose.yml" up -d; then
+  if ! sudo docker compose -p project-haven -f "${HAVEN_DIR}/compose.yml" up -d; then
     echo -e "${RED}#${RESET} Failed to start management containers. Please check the logs and try again."
     exit 1
   fi
@@ -538,11 +538,11 @@ verify_gpu_setup() {
 }
 
 success_message() {
-  echo -e "${GREEN}#${RESET} Project N.O.M.A.D installation completed successfully!\\n"
-  echo -e "${GREEN}#${RESET} Installation files are located at /opt/project-nomad\\n\n"
-  echo -e "${GREEN}#${RESET} Project N.O.M.A.D's Command Center should automatically start whenever your device reboots. However, if you need to start it manually, you can always do so by running: ${WHITE_R}${NOMAD_DIR}/start_nomad.sh${RESET}\\n"
+  echo -e "${GREEN}#${RESET} Project H.A.V.E.N installation completed successfully!\\n"
+  echo -e "${GREEN}#${RESET} Installation files are located at /opt/project-haven\\n\n"
+  echo -e "${GREEN}#${RESET} Project H.A.V.E.N's Command Center should automatically start whenever your device reboots. However, if you need to start it manually, you can always do so by running: ${WHITE_R}${HAVEN_DIR}/start_haven.sh${RESET}\\n"
   echo -e "${GREEN}#${RESET} You can now access the management interface at http://localhost:8080 or http://${local_ip_address}:8080\\n"
-  echo -e "${GREEN}#${RESET} Thank you for supporting Project N.O.M.A.D!\\n"
+  echo -e "${GREEN}#${RESET} Thank you for supporting Project H.A.V.E.N!\\n"
 }
 
 ###################################################################################################################################################################################################
@@ -565,7 +565,7 @@ ensure_docker_installed
 check_docker_compose
 setup_nvidia_container_toolkit
 get_local_ip
-create_nomad_directory
+create_haven_directory
 download_sidecar_files
 download_helper_scripts
 download_management_compose_file

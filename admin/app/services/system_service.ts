@@ -4,7 +4,7 @@ import { DockerService } from '#services/docker_service'
 import { ServiceSlim } from '../../types/services.js'
 import logger from '@adonisjs/core/services/logger'
 import si from 'systeminformation'
-import { GpuHealthStatus, NomadDiskInfo, NomadDiskInfoRaw, SystemInformationResponse } from '../../types/system.js'
+import { GpuHealthStatus, HavenDiskInfo, HavenDiskInfoRaw, SystemInformationResponse } from '../../types/system.js'
 import { SERVICE_NAMES } from '../../constants/service_names.js'
 import { readFileSync } from 'fs'
 import path, { join } from 'path'
@@ -19,7 +19,7 @@ import { isNewerVersion } from '../utils/version.js'
 @inject()
 export class SystemService {
   private static appVersion: string | null = null
-  private static diskInfoFile = '/storage/nomad-disk-info.json'
+  private static diskInfoFile = '/storage/haven-disk-info.json'
 
   constructor(private dockerService: DockerService) { }
 
@@ -220,8 +220,8 @@ export class SystemService {
         si.graphics(),
       ])
 
-      let diskInfo: NomadDiskInfoRaw | undefined
-      let disk: NomadDiskInfo[] = []
+      let diskInfo: HavenDiskInfoRaw | undefined
+      let disk: HavenDiskInfo[] = []
 
       try {
         const diskInfoRawString = await getFile(
@@ -233,7 +233,7 @@ export class SystemService {
           diskInfoRawString
             ? JSON.parse(diskInfoRawString.toString())
             : { diskLayout: { blockdevices: [] }, fsSize: [] }
-        ) as NomadDiskInfoRaw
+        ) as HavenDiskInfoRaw
 
         disk = this.calculateDiskUsage(diskInfo)
       } catch (error) {
@@ -340,14 +340,14 @@ export class SystemService {
       let latestVersion: string
       if (earlyAccess) {
         const response = await axios.get(
-          'https://api.github.com/repos/Crosstalk-Solutions/project-nomad/releases',
+          'https://api.github.com/repos/Crosstalk-Solutions/project-haven/releases',
           { headers: { Accept: 'application/vnd.github+json' }, timeout: 5000 }
         )
         if (!response?.data?.length) throw new Error('No releases found')
         latestVersion = response.data[0].tag_name.replace(/^v/, '').trim()
       } else {
         const response = await axios.get(
-          'https://api.github.com/repos/Crosstalk-Solutions/project-nomad/releases/latest',
+          'https://api.github.com/repos/Crosstalk-Solutions/project-haven/releases/latest',
           { headers: { Accept: 'application/vnd.github+json' }, timeout: 5000 }
         )
         if (!response?.data?.tag_name) throw new Error('Invalid response from GitHub API')
@@ -385,7 +385,7 @@ export class SystemService {
   async subscribeToReleaseNotes(email: string): Promise<{ success: boolean; message: string }> {
     try {
       const response = await axios.post(
-        'https://api.projectnomad.us/api/v1/lists/release-notes/subscribe',
+        'https://api.projecthaven.us/api/v1/lists/release-notes/subscribe',
         { email },
         { timeout: 5000 }
       )
@@ -422,7 +422,7 @@ export class SystemService {
     ])
 
     const lines: string[] = [
-      'Project NOMAD Debug Info',
+      'Project HAVEN Debug Info',
       '========================',
       `App Version: ${appVersion}`,
       `Environment: ${environment}`,
@@ -572,7 +572,7 @@ export class SystemService {
     }
   }
 
-  private calculateDiskUsage(diskInfo: NomadDiskInfoRaw): NomadDiskInfo[] {
+  private calculateDiskUsage(diskInfo: HavenDiskInfoRaw): HavenDiskInfo[] {
     const { diskLayout, fsSize } = diskInfo
 
     if (!diskLayout?.blockdevices || !fsSize) {
@@ -581,7 +581,7 @@ export class SystemService {
 
     // Deduplicate: same device path mounted in multiple places (Docker bind-mounts)
     // Keep the entry with the largest size — that's the real partition
-    const deduped = new Map<string, NomadDiskInfoRaw['fsSize'][0]>()
+    const deduped = new Map<string, HavenDiskInfoRaw['fsSize'][0]>()
     for (const entry of fsSize) {
       const existing = deduped.get(entry.fs)
       if (!existing || entry.size > existing.size) {

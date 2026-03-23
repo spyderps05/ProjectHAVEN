@@ -83,7 +83,7 @@ export class RunDownloadJob {
             await zimService.downloadRemoteSuccessCallback([url], true)
 
             // Only dispatch embedding job if AI Assistant (Ollama) is installed
-            const ollamaUrl = await dockerService.getServiceURL('nomad_ollama')
+            const ollamaUrl = await dockerService.getServiceURL('haven_ollama')
             if (ollamaUrl) {
               try {
                 await EmbedFileJob.dispatch({

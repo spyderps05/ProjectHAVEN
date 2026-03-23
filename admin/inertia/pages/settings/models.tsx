@@ -2,7 +2,7 @@ import { Head, router, usePage } from '@inertiajs/react'
 import { useRef, useState } from 'react'
 import StyledTable from '~/components/StyledTable'
 import SettingsLayout from '~/layouts/SettingsLayout'
-import { NomadOllamaModel } from '../../../types/ollama'
+import { HavenOllamaModel } from '../../../types/ollama'
 import StyledButton from '~/components/StyledButton'
 import useServiceInstalledStatus from '~/hooks/useServiceInstalledStatus'
 import Alert from '~/components/Alert'
@@ -23,7 +23,7 @@ import { useSystemInfo } from '~/hooks/useSystemInfo'
 
 export default function ModelsPage(props: {
   models: {
-    availableModels: NomadOllamaModel[]
+    availableModels: HavenOllamaModel[]
     installedModels: ModelResponse[]
     settings: { chatSuggestionsEnabled: boolean; aiAssistantCustomName: string }
   }
@@ -37,7 +37,7 @@ export default function ModelsPage(props: {
 
   const [gpuBannerDismissed, setGpuBannerDismissed] = useState(() => {
     try {
-      return localStorage.getItem('nomad:gpu-banner-dismissed') === 'true'
+      return localStorage.getItem('haven:gpu-banner-dismissed') === 'true'
     } catch {
       return false
     }
@@ -47,7 +47,7 @@ export default function ModelsPage(props: {
   const handleDismissGpuBanner = () => {
     setGpuBannerDismissed(true)
     try {
-      localStorage.setItem('nomad:gpu-banner-dismissed', 'true')
+      localStorage.setItem('haven:gpu-banner-dismissed', 'true')
     } catch {}
   }
 
@@ -59,7 +59,7 @@ export default function ModelsPage(props: {
           closeAllModals()
           setReinstalling(true)
           try {
-            const response = await api.forceReinstallService('nomad_ollama')
+            const response = await api.forceReinstallService('haven_ollama')
             if (!response || !response.success) {
               throw new Error(response?.message || 'Force reinstall failed')
             }
@@ -67,7 +67,7 @@ export default function ModelsPage(props: {
               message: `${aiAssistantName} is being reinstalled with GPU support. This page will reload shortly.`,
               type: 'success',
             })
-            try { localStorage.removeItem('nomad:gpu-banner-dismissed') } catch {}
+            try { localStorage.removeItem('haven:gpu-banner-dismissed') } catch {}
             setTimeout(() => window.location.reload(), 5000)
           } catch (error) {
             addNotification({
@@ -220,7 +220,7 @@ export default function ModelsPage(props: {
 
   return (
     <SettingsLayout>
-      <Head title={`${aiAssistantName} Settings | Project N.O.M.A.D.`} />
+      <Head title={`${aiAssistantName} Settings | Project H.A.V.E.N.`} />
       <div className="xl:pl-72 w-full">
         <main className="px-12 py-6">
           <h1 className="text-4xl font-semibold mb-4">{aiAssistantName}</h1>
@@ -312,7 +312,7 @@ export default function ModelsPage(props: {
               Refresh Models
             </StyledButton>
           </div>
-          <StyledTable<NomadOllamaModel>
+          <StyledTable<HavenOllamaModel>
             className="font-semibold mt-4"
             rowLines={true}
             columns={[

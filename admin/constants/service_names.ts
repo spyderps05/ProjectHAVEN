@@ -1,8 +1,8 @@
 export const SERVICE_NAMES = {
-  KIWIX: 'nomad_kiwix_server',
-  OLLAMA: 'nomad_ollama',
-  QDRANT: 'nomad_qdrant',
-  CYBERCHEF: 'nomad_cyberchef',
-  FLATNOTES: 'nomad_flatnotes',
-  KOLIBRI: 'nomad_kolibri',
+  KIWIX: 'haven_kiwix_server',
+  OLLAMA: 'haven_ollama',
+  QDRANT: 'haven_qdrant',
+  CYBERCHEF: 'haven_cyberchef',
+  FLATNOTES: 'haven_flatnotes',
+  KOLIBRI: 'haven_kolibri',
 }

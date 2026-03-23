@@ -1,14 +1,14 @@
-export type NomadOllamaModel = {
+export type HavenOllamaModel = {
   id: string
   name: string
   description: string
   estimated_pulls: string
   model_last_updated: string
   first_seen: string
-  tags: NomadOllamaModelTag[]
+  tags: HavenOllamaModelTag[]
 }
 
-export type NomadOllamaModelTag = {
+export type HavenOllamaModelTag = {
   name: string
   size: string
   context: string
@@ -17,10 +17,10 @@ export type NomadOllamaModelTag = {
   thinking: boolean
 }
 
-export type NomadOllamaModelAPIResponse = {
+export type HavenOllamaModelAPIResponse = {
   success: boolean
   message: string
-  models: NomadOllamaModel[]
+  models: HavenOllamaModel[]
 }
 
 export type OllamaChatMessage = {

@@ -17,7 +17,7 @@ import { BROADCAST_CHANNELS } from '../../constants/broadcast.js'
 export class DockerService {
   public docker: Docker
   private activeInstallations: Set<string> = new Set()
-  public static NOMAD_NETWORK = 'project-nomad_default'
+  public static HAVEN_NETWORK = 'project-haven_default'
 
   constructor() {
     // Support both Linux (production) and Windows (development with Docker Desktop)
@@ -101,7 +101,7 @@ export class DockerService {
   }
 
   /**
-   * Fetches the status of all Docker containers related to Nomad services. (those prefixed with 'nomad_')
+   * Fetches the status of all Docker containers related to Haven services. (those prefixed with 'haven_')
    */
   async getServicesStatus(): Promise<
     {
@@ -114,7 +114,7 @@ export class DockerService {
       const containerMap = new Map<string, Docker.ContainerInfo>()
       containers.forEach((container) => {
         const name = container.Names[0]?.replace('/', '')
-        if (name && name.startsWith('nomad_')) {
+        if (name && name.startsWith('haven_')) {
           containerMap.set(name, container)
         }
       })
@@ -514,11 +514,11 @@ export class DockerService {
         ...(containerConfig?.ExposedPorts && { ExposedPorts: containerConfig.ExposedPorts }),
         ...(containerConfig?.Env && { Env: containerConfig.Env }),
         ...(service.container_command ? { Cmd: service.container_command.split(' ') } : {}),
-        // Ensure container is attached to the Nomad docker network in production
+        // Ensure container is attached to the Haven docker network in production
         ...(process.env.NODE_ENV === 'production' && {
           NetworkingConfig: {
             EndpointsConfig: {
-              [DockerService.NOMAD_NETWORK]: {},
+              [DockerService.HAVEN_NETWORK]: {},
             },
           },
         }),
@@ -543,19 +543,19 @@ export class DockerService {
       // Remove from active installs tracking
       this.activeInstallations.delete(service.service_name)
 
-      // If Ollama was just installed, trigger Nomad docs discovery and embedding
+      // If Ollama was just installed, trigger Haven docs discovery and embedding
       if (service.service_name === SERVICE_NAMES.OLLAMA) {
         logger.info('[DockerService] Ollama installation complete. Default behavior is to not enable chat suggestions.')
         await KVStore.setValue('chat.suggestionsEnabled', false)
 
-        logger.info('[DockerService] Ollama installation complete. Triggering Nomad docs discovery...')
+        logger.info('[DockerService] Ollama installation complete. Triggering Haven docs discovery...')
         
         // Need to use dynamic imports here to avoid circular dependency
         const ollamaService = new (await import('./ollama_service.js')).OllamaService()
         const ragService = new (await import('./rag_service.js')).RagService(this, ollamaService)
 
-        ragService.discoverNomadDocs().catch((error) => {
-          logger.error('[DockerService] Failed to discover Nomad docs:', error)
+        ragService.discoverHavenDocs().catch((error) => {
+          logger.error('[DockerService] Failed to discover Haven docs:', error)
         })
       }
 
@@ -615,7 +615,7 @@ export class DockerService {
      * We'll download the lightweight mini Wikipedia Top 100 zim file for this purpose.
      **/
     const WIKIPEDIA_ZIM_URL =
-      'https://github.com/Crosstalk-Solutions/project-nomad/raw/refs/heads/main/install/wikipedia_en_100_mini_2025-06.zim'
+      'https://github.com/Crosstalk-Solutions/project-haven/raw/refs/heads/main/install/wikipedia_en_100_mini_2025-06.zim'
     const filename = 'wikipedia_en_100_mini_2025-06.zim'
     const filepath = join(process.cwd(), ZIM_STORAGE_PATH, filename)
     logger.info(`[DockerService] Kiwix Serve pre-install: Downloading ZIM file to ${filepath}`)

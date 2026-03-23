@@ -7,7 +7,7 @@ import { DownloadJobWithProgress, WikipediaState } from '../../types/downloads'
 import { EmbedJobWithProgress } from '../../types/rag'
 import type { CategoryWithStatus, CollectionWithStatus, ContentUpdateCheckResult, ResourceUpdateInfo } from '../../types/collections'
 import { catchInternal } from './util'
-import { NomadOllamaModel, OllamaChatRequest } from '../../types/ollama'
+import { HavenOllamaModel, OllamaChatRequest } from '../../types/ollama'
 import { ChatResponse, ModelResponse } from 'ollama'
 import BenchmarkResult from '#models/benchmark_result'
 import { BenchmarkType, RunBenchmarkResponse, SubmitBenchmarkResponse, UpdateBuilderTagResponse } from '../../types/benchmark'
@@ -235,7 +235,7 @@ class API {
   async getAvailableModels(params: { query?: string; recommendedOnly?: boolean; limit?: number; force?: boolean }) {
     return catchInternal(async () => {
       const response = await this.client.get<{
-        models: NomadOllamaModel[]
+        models: HavenOllamaModel[]
         hasMore: boolean
       }>('/ollama/models', {
         params: { sort: 'pulls', ...params },

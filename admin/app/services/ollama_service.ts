@@ -1,6 +1,6 @@
 import { inject } from '@adonisjs/core'
 import { ChatRequest, Ollama } from 'ollama'
-import { NomadOllamaModel } from '../../types/ollama.js'
+import { HavenOllamaModel } from '../../types/ollama.js'
 import { FALLBACK_RECOMMENDED_OLLAMA_MODELS } from '../../constants/ollama.js'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -12,9 +12,9 @@ import transmit from '@adonisjs/transmit/services/main'
 import Fuse, { IFuseOptions } from 'fuse.js'
 import { BROADCAST_CHANNELS } from '../../constants/broadcast.js'
 import env from '#start/env'
-import { NOMAD_API_DEFAULT_BASE_URL } from '../../constants/misc.js'
+import { HAVEN_API_DEFAULT_BASE_URL } from '../../constants/misc.js'
 
-const NOMAD_MODELS_API_PATH = '/api/v1/ollama/models'
+const HAVEN_MODELS_API_PATH = '/api/v1/ollama/models'
 const MODELS_CACHE_FILE = path.join(process.cwd(), 'storage', 'ollama-models-cache.json')
 const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000 // 24 hours
 
@@ -189,7 +189,7 @@ export class OllamaService {
       query: null,
       limit: 15,
     }
-  ): Promise<{ models: NomadOllamaModel[], hasMore: boolean } | null> {
+  ): Promise<{ models: HavenOllamaModel[], hasMore: boolean } | null> {
     try {
       const models = await this.retrieveAndRefreshModels(sort, force)
       if (!models) {
@@ -246,7 +246,7 @@ export class OllamaService {
   private async retrieveAndRefreshModels(
     sort?: 'pulls' | 'name',
     force?: boolean
-  ): Promise<NomadOllamaModel[] | null> {
+  ): Promise<HavenOllamaModel[] | null> {
     try {
       if (!force) {
         const cachedModels = await this.readModelsFromCache()
@@ -260,8 +260,8 @@ export class OllamaService {
 
       logger.info('[OllamaService] Fetching fresh available models from API')
 
-      const baseUrl = env.get('NOMAD_API_URL') || NOMAD_API_DEFAULT_BASE_URL
-      const fullUrl = new URL(NOMAD_MODELS_API_PATH, baseUrl).toString()
+      const baseUrl = env.get('HAVEN_API_URL') || HAVEN_API_DEFAULT_BASE_URL
+      const fullUrl = new URL(HAVEN_MODELS_API_PATH, baseUrl).toString()
 
       const response = await axios.get(fullUrl)
       if (!response.data || !Array.isArray(response.data.models)) {
@@ -271,7 +271,7 @@ export class OllamaService {
         return null
       }
 
-      const rawModels = response.data.models as NomadOllamaModel[]
+      const rawModels = response.data.models as HavenOllamaModel[]
 
       // Filter out tags where cloud is truthy, then remove models with no remaining tags
       const noCloud = rawModels
@@ -285,14 +285,14 @@ export class OllamaService {
       return this.sortModels(noCloud, sort)
     } catch (error) {
       logger.error(
-        `[OllamaService] Failed to retrieve models from Nomad API: ${error instanceof Error ? error.message : error
+        `[OllamaService] Failed to retrieve models from Haven API: ${error instanceof Error ? error.message : error
         }`
       )
       return null
     }
   }
 
-  private async readModelsFromCache(): Promise<NomadOllamaModel[] | null> {
+  private async readModelsFromCache(): Promise<HavenOllamaModel[] | null> {
     try {
       const stats = await fs.stat(MODELS_CACHE_FILE)
       const cacheAge = Date.now() - stats.mtimeMs
@@ -303,7 +303,7 @@ export class OllamaService {
       }
 
       const cacheData = await fs.readFile(MODELS_CACHE_FILE, 'utf-8')
-      const models = JSON.parse(cacheData) as NomadOllamaModel[]
+      const models = JSON.parse(cacheData) as HavenOllamaModel[]
 
       if (!Array.isArray(models)) {
         logger.warn('[OllamaService] Invalid cache format, will fetch fresh data')
@@ -322,7 +322,7 @@ export class OllamaService {
     }
   }
 
-  private async writeModelsToCache(models: NomadOllamaModel[]): Promise<void> {
+  private async writeModelsToCache(models: HavenOllamaModel[]): Promise<void> {
     try {
       await fs.mkdir(path.dirname(MODELS_CACHE_FILE), { recursive: true })
       await fs.writeFile(MODELS_CACHE_FILE, JSON.stringify(models, null, 2), 'utf-8')
@@ -334,7 +334,7 @@ export class OllamaService {
     }
   }
 
-  private sortModels(models: NomadOllamaModel[], sort?: 'pulls' | 'name'): NomadOllamaModel[] {
+  private sortModels(models: HavenOllamaModel[], sort?: 'pulls' | 'name'): HavenOllamaModel[] {
     if (sort === 'pulls') {
       // Sort by estimated pulls (it should be a string like "1.2K", "500", "4M" etc.)
       models.sort((a, b) => {
@@ -388,8 +388,8 @@ export class OllamaService {
     logger.info(`[OllamaService] Download progress for model "${model}": ${percent}%`)
   }
 
-  private fuseSearchModels(models: NomadOllamaModel[], query: string): NomadOllamaModel[] {
-    const options: IFuseOptions<NomadOllamaModel> = {
+  private fuseSearchModels(models: HavenOllamaModel[], query: string): HavenOllamaModel[] {
+    const options: IFuseOptions<HavenOllamaModel> = {
       ignoreDiacritics: true,
       keys: ['name', 'description', 'tags.name'],
       threshold: 0.3, // lower threshold for stricter matching

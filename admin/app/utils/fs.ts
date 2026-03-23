@@ -2,7 +2,7 @@ import { mkdir, readdir, readFile, stat, unlink } from 'fs/promises'
 import path, { join } from 'path'
 import { FileEntry } from '../../types/files.js'
 import { createReadStream } from 'fs'
-import { LSBlockDevice, NomadDiskInfoRaw } from '../../types/system.js'
+import { LSBlockDevice, HavenDiskInfoRaw } from '../../types/system.js'
 
 export const ZIM_STORAGE_PATH = '/storage/zim'
 
@@ -110,9 +110,9 @@ export async function deleteFileIfExists(path: string): Promise<void> {
 
 export function getAllFilesystems(
   device: LSBlockDevice,
-  fsSize: NomadDiskInfoRaw['fsSize']
-): NomadDiskInfoRaw['fsSize'] {
-  const filesystems: NomadDiskInfoRaw['fsSize'] = []
+  fsSize: HavenDiskInfoRaw['fsSize']
+): HavenDiskInfoRaw['fsSize'] {
+  const filesystems: HavenDiskInfoRaw['fsSize'] = []
   const seen = new Set()
 
   function traverse(dev: LSBlockDevice) {
